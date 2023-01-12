@@ -21,6 +21,7 @@
 // See https://cordova.apache.org/docs/en/latest/cordova/events/events.html#deviceready
 document.addEventListener('deviceready', onDeviceReady, false);
 
+var arrayObjetos = [];
 function onDeviceReady() {
     // Cordova is now initialized. Have fun!
 
@@ -32,12 +33,14 @@ let boton = document.getElementById("botonAdd");
 boton.addEventListener("click", add);
 let botonEdit = document.getElementById("botonEnviarEdicion");
 botonEdit.addEventListener("click", enviarEdicion);
+
 function add(){
     valor = prompt("Que quieres añadir");
     $("ul").append("<li><h1>"+ valor + "</h1><button class='btnEliminar ui-btn ui-shadow ui-corner-all'>Eliminar</button><a href='#editar' class='aEditar'><button class='btnEditar ui-btn ui-shadow ui-corner-all'>Editar</button></a></li>");
     $("ul").listview("refresh");
     insertarFuncionBtones()
     insertarFuncionBtonesEditar()
+    setearLocal()
 }
 
 function insertarFuncionBtones(){
@@ -48,6 +51,7 @@ function insertarFuncionBtones(){
 
 function eliminar(e){
     $(e.target).parent().remove()
+    setearLocal()
 }
 
 function insertarFuncionBtonesEditar(){
@@ -67,7 +71,26 @@ function editar(e){
 function enviarEdicion(){
    let texto = $('#inputEditar').val()
    elemento.text(texto)
+   setearLocal()
 }
-insertarFuncionBtonesEditar();
 
-insertarFuncionBtones();
+function setearLocal(){
+    arrayObjetos = [];
+    $("ul>li>h1").each(function (){
+        arrayObjetos.push($(this).text())
+    })
+    arrayObjetos = JSON.stringify(arrayObjetos)
+    localStorage.setItem("objetos", arrayObjetos);
+}
+loadItems()
+function loadItems(){
+    let items = localStorage.getItem("objetos")
+    items = JSON.parse(items)
+    console.log(items)
+    for(let i = 0; i<items.length;i++){
+    $("ul").append("<li><h1>"+ items[i] + "</h1><button class='btnEliminar ui-btn ui-shadow ui-corner-all'>Eliminar</button><a href='#editar' class='aEditar'><button class='btnEditar ui-btn ui-shadow ui-corner-all'>Editar</button></a></li>");
+    insertarFuncionBtones()
+    insertarFuncionBtonesEditar()
+    }
+    $("ul").listview("refresh");
+}
